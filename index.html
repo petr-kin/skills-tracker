@@ -1,22 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QA Skills Tracker</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QA Skills Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #2563eb;
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            background-color: #f9fafb;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #2563eb;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+    </style>
 </head>
 <body>
-  <div id="root"></div>
-  
-  <!-- Load React -->
-  <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
-  
-  <!-- Load Babel for JSX -->
-  <script src="https://unpkg.com/@babel/standalone@7.18.8/babel.min.js"></script>
-  
-  <!-- Load your app -->
-  <script type="text/babel" src="app.js"></script>
+    <h1>QA Skills Tracker</h1>
+    <p>Track your journey to becoming a QA automation expert</p>
+    
+    <div class="card">
+        <h2>Frameworks</h2>
+        <ul>
+            <li>Playwright</li>
+            <li>Selenium</li>
+            <li>Cypress</li>
+        </ul>
+        <a href="#" class="btn">View Details</a>
+    </div>
+    
+    <div class="card">
+        <h2>Languages</h2>
+        <ul>
+            <li>JavaScript</li>
+            <li>TypeScript</li>
+            <li>Python</li>
+        </ul>
+        <a href="#" class="btn">View Details</a>
+    </div>
+    
+    <p>This is a static version of the QA Skills Tracker.</p>
 </body>
 </html>
