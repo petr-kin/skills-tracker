@@ -1,4 +1,4 @@
-// QA Skills Tracker with localStorage persistence
+// QA Skills Tracker with GitHub Integration
 const { useState, useEffect } = React;
 
 // Initial skills data
@@ -27,18 +27,49 @@ const initialSkills = {
 
 // Main App Component
 function App() {
-  // Load from localStorage or use initial data
+  // State for skills and UI
   const [skills, setSkills] = useState(() => {
     const savedSkills = localStorage.getItem('qaSkills');
     return savedSkills ? JSON.parse(savedSkills) : initialSkills;
   });
   
   const [activeCategory, setActiveCategory] = useState('frameworks');
+  const [showGitHubModal, setShowGitHubModal] = useState(false);
+  
+  // GitHub state
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [octokit, setOctokit] = useState(null);
+  const [repo, setRepo] = useState({ owner: '', repo: '' });
+  const [token, setToken] = useState('');
+  const [owner, setOwner] = useState('');
+  const [repoName, setRepoName] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [githubError, setGithubError] = useState(null);
+  const [lastSaved, setLastSaved] = useState(null);
 
-  // Save to localStorage whenever skills change
+  // Save skills to localStorage
   useEffect(() => {
     localStorage.setItem('qaSkills', JSON.stringify(skills));
   }, [skills]);
+  
+  // Try to restore GitHub auth on load
+  useEffect(() => {
+    const savedToken = localStorage.getItem('github_token');
+    const savedOwner = localStorage.getItem('github_owner');
+    const savedRepo = localStorage.getItem('github_repo');
+    const savedTime = localStorage.getItem('github_last_saved');
+    
+    if (savedToken && savedOwner && savedRepo) {
+      setToken(savedToken);
+      setOwner(savedOwner);
+      setRepoName(savedRepo);
+      authenticateWithGitHub(savedToken, savedOwner, savedRepo);
+      
+      if (savedTime) {
+        setLastSaved(new Date(parseInt(savedTime)));
+      }
+    }
+  }, []);
 
   // Handle skill level change
   const handleLevelChange = (category, index, newLevel) => {
@@ -85,7 +116,272 @@ function App() {
     };
   };
 
+  // GitHub Authentication
+  const authenticateWithGitHub = async (tokenVal, ownerVal, repoVal) => {
+    try {
+      setIsLoading(true);
+      setGithubError(null);
+      
+      // Create Octokit instance
+      const oktokitInstance = new Octokit.Octokit({ auth: tokenVal });
+      
+      // Test authentication
+      await oktokitInstance.rest.users.getAuthenticated();
+      
+      setOctokit(oktokitInstance);
+      setRepo({ owner: ownerVal, repo: repoVal });
+      setIsAuthenticated(true);
+      
+      // Save to localStorage
+      localStorage.setItem('github_token', tokenVal);
+      localStorage.setItem('github_owner', ownerVal);
+      localStorage.setItem('github_repo', repoVal);
+      
+      setIsLoading(false);
+      return true;
+    } catch (err) {
+      setGithubError(`Authentication failed: ${err.message}`);
+      setIsLoading(false);
+      return false;
+    }
+  };
+
+  // Save to GitHub
+  const saveToGitHub = async () => {
+    if (!isAuthenticated || !octokit) {
+      setGithubError('Not authenticated with GitHub');
+      return;
+    }
+    
+    try {
+      setIsLoading(true);
+      
+      // Save skills data
+      await saveFile('qa-skills-data.json', JSON.stringify(skills, null, 2));
+      
+      const now = new Date();
+      setLastSaved(now);
+      localStorage.setItem('github_last_saved', now.getTime().toString());
+      
+      setIsLoading(false);
+      alert('Progress saved to GitHub successfully!');
+    } catch (err) {
+      setGithubError(`Failed to save: ${err.message}`);
+      setIsLoading(false);
+    }
+  };
+
+  // Load from GitHub
+  const loadFromGitHub = async () => {
+    if (!isAuthenticated || !octokit) {
+      setGithubError('Not authenticated with GitHub');
+      return;
+    }
+    
+    try {
+      setIsLoading(true);
+      
+      // Try to load skills data
+      try {
+        const { data } = await octokit.rest.repos.getContent({
+          owner: repo.owner,
+          repo: repo.repo,
+          path: 'qa-skills-data.json'
+        });
+        
+        const content = atob(data.content);
+        const parsedData = JSON.parse(content);
+        setSkills(parsedData);
+        localStorage.setItem('qaSkills', JSON.stringify(parsedData));
+        
+        alert('Data loaded from GitHub successfully!');
+      } catch (e) {
+        alert('No existing data found on GitHub. Save your current progress first.');
+      }
+      
+      setIsLoading(false);
+    } catch (err) {
+      setGithubError(`Failed to load: ${err.message}`);
+      setIsLoading(false);
+    }
+  };
+
+  // Helper to save a file to GitHub
+  const saveFile = async (path, content) => {
+    // Check if file exists
+    let sha;
+    try {
+      const { data } = await octokit.rest.repos.getContent({
+        owner: repo.owner,
+        repo: repo.repo,
+        path
+      });
+      sha = data.sha;
+    } catch (e) {
+      // File doesn't exist yet, which is fine
+    }
+    
+    // Create or update file
+    await octokit.rest.repos.createOrUpdateFileContents({
+      owner: repo.owner,
+      repo: repo.repo,
+      path,
+      message: `Update ${path} - ${new Date().toISOString()}`,
+      content: btoa(content),
+      sha
+    });
+  };
+
+  // Disconnect from GitHub
+  const disconnectGitHub = () => {
+    if (confirm('Are you sure you want to disconnect from GitHub? Your local progress will be kept.')) {
+      setIsAuthenticated(false);
+      setOctokit(null);
+      setLastSaved(null);
+      localStorage.removeItem('github_token');
+      localStorage.removeItem('github_owner');
+      localStorage.removeItem('github_repo');
+      localStorage.removeItem('github_last_saved');
+    }
+  };
+
   const progress = calculateProgress();
+
+  // GitHub Modal Component
+  const GitHubModal = () => {
+    if (!showGitHubModal) return null;
+    
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      const success = await authenticateWithGitHub(token, owner, repoName);
+      if (success) {
+        setShowGitHubModal(false);
+      }
+    };
+    
+    return (
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 999
+      }}>
+        <div style={{
+          backgroundColor: 'white',
+          padding: '2rem',
+          borderRadius: '0.5rem',
+          maxWidth: '500px',
+          width: '100%'
+        }}>
+          <h2 style={{ marginTop: 0 }}>Connect to GitHub</h2>
+          
+          <form onSubmit={handleSubmit}>
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.25rem' }}>
+                Personal Access Token
+              </label>
+              <input
+                type="password"
+                value={token}
+                onChange={(e) => setToken(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '0.5rem',
+                  border: '1px solid #ddd',
+                  borderRadius: '0.25rem'
+                }}
+                required
+              />
+              <small style={{ color: '#666', fontSize: '0.8rem' }}>
+                Create a token with 'repo' scope at{' '}
+                <a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener noreferrer">
+                  GitHub Settings
+                </a>
+              </small>
+            </div>
+            
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.25rem' }}>
+                GitHub Username
+              </label>
+              <input
+                type="text"
+                value={owner}
+                onChange={(e) => setOwner(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '0.5rem',
+                  border: '1px solid #ddd',
+                  borderRadius: '0.25rem'
+                }}
+                required
+              />
+            </div>
+            
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.25rem' }}>
+                Repository Name
+              </label>
+              <input
+                type="text"
+                value={repoName}
+                onChange={(e) => setRepoName(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '0.5rem',
+                  border: '1px solid #ddd',
+                  borderRadius: '0.25rem'
+                }}
+                required
+              />
+            </div>
+            
+            {githubError && (
+              <div style={{ color: '#ef4444', marginBottom: '1rem' }}>
+                {githubError}
+              </div>
+            )}
+            
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+              <button
+                type="button"
+                onClick={() => setShowGitHubModal(false)}
+                style={{
+                  padding: '0.5rem 1rem',
+                  border: '1px solid #ddd',
+                  borderRadius: '0.25rem',
+                  backgroundColor: 'white',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isLoading}
+                style={{
+                  padding: '0.5rem 1rem',
+                  border: 'none',
+                  borderRadius: '0.25rem',
+                  backgroundColor: '#3b82f6',
+                  color: 'white',
+                  cursor: isLoading ? 'wait' : 'pointer'
+                }}
+              >
+                {isLoading ? 'Connecting...' : 'Connect'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div>
@@ -97,6 +393,83 @@ function App() {
       </header>
 
       <div className="container">
+        {/* GitHub Integration */}
+        <div className="card" style={{ marginBottom: '1.5rem' }}>
+          <h2>GitHub Sync</h2>
+          
+          {isAuthenticated ? (
+            <div>
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                marginBottom: '1rem',
+                color: '#16a34a'
+              }}>
+                <span style={{ 
+                  display: 'inline-block',
+                  width: '16px',
+                  height: '16px',
+                  borderRadius: '50%',
+                  backgroundColor: '#16a34a',
+                  marginRight: '0.5rem'
+                }}></span>
+                <span>Connected to GitHub: {repo.owner}/{repo.repo}</span>
+              </div>
+              
+              {lastSaved && (
+                <div style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                  Last saved: {lastSaved.toLocaleString()}
+                </div>
+              )}
+              
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button
+                  onClick={loadFromGitHub}
+                  disabled={isLoading}
+                  className="btn"
+                  style={{ backgroundColor: '#3b82f6' }}
+                >
+                  {isLoading ? 'Loading...' : 'Load from GitHub'}
+                </button>
+                
+                <button
+                  onClick={saveToGitHub}
+                  disabled={isLoading}
+                  className="btn"
+                  style={{ backgroundColor: '#16a34a' }}
+                >
+                  {isLoading ? 'Saving...' : 'Save to GitHub'}
+                </button>
+                
+                <button
+                  onClick={disconnectGitHub}
+                  className="btn"
+                  style={{ backgroundColor: '#6b7280' }}
+                >
+                  Disconnect
+                </button>
+              </div>
+              
+              {githubError && (
+                <div style={{ color: '#ef4444', marginTop: '0.5rem', fontSize: '0.9rem' }}>
+                  {githubError}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div>
+              <p>Connect to GitHub to save your progress and access it from any device.</p>
+              <button
+                onClick={() => setShowGitHubModal(true)}
+                className="btn"
+                style={{ backgroundColor: '#3b82f6', marginTop: '0.5rem' }}
+              >
+                Connect to GitHub
+              </button>
+            </div>
+          )}
+        </div>
+
         {/* Progress bar */}
         <div className="card" style={{ marginBottom: '1.5rem' }}>
           <h2>Overall Progress</h2>
@@ -160,4 +533,74 @@ function App() {
                   borderRadius: '1rem', 
                   fontSize: '0.8rem',
                   backgroundColor: skill.priority === 'high' ? '#fee2e2' : 
-                                  skill.prio
+                                  skill.priority === 'medium' ? '#fef3c7' : '#d1fae5',
+                  color: skill.priority === 'high' ? '#b91c1c' : 
+                         skill.priority === 'medium' ? '#92400e' : '#065f46'
+                }}>
+                  {skill.priority} priority
+                </span>
+              </div>
+              
+              <div>
+                <p>Proficiency: <strong>{getLevelLabel(skill.level)}</strong></p>
+                <div>
+                  {[0, 1, 2, 3].map(level => (
+                    <button
+                      key={level}
+                      onClick={() => handleLevelChange(activeCategory, index, level)}
+                      title={getLevelLabel(level)}
+                      className={`skill-level ${skill.level >= level && level > 0 ? `level-${level}` : ''}`}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      {skill.level >= level && level > 0 ? '✓' : ''}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Resources section */}
+              {skill.resources && skill.resources.length > 0 && (
+                <div style={{ marginTop: '1rem' }}>
+                  <h4 style={{ fontSize: '0.9rem', margin: '0 0 0.25rem 0' }}>Learning Resources:</h4>
+                  <ul style={{ margin: 0, paddingLeft: '1.5rem' }}>
+                    {skill.resources.map((resource, idx) => (
+                      <li key={idx}>
+                        <a 
+                          href={resource.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          style={{ color: '#3b82f6' }}
+                        >
+                          {resource.title}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        
+        {/* Footer */}
+        <div style={{ 
+          margin: '2rem 0', 
+          padding: '1rem', 
+          textAlign: 'center',
+          borderTop: '1px solid #ddd',
+          color: '#666',
+          fontSize: '0.9rem'
+        }}>
+          Your progress is automatically saved in your browser's local storage.
+          {isAuthenticated && " You can also save to GitHub for backup and cross-device access."}
+        </div>
+      </div>
+      
+      {/* GitHub Authentication Modal */}
+      <GitHubModal />
+    </div>
+  );
+}
+
+// Render the app
+ReactDOM.render(<App />, document.getElementById('root'));
