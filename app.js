@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+// Enhanced QA Skills Tracker with GitHub Integration, Courses & Projects
+const { useState, useEffect } = React;
 
 // Initial skills data (expanded)
 const initialSkills = {
@@ -186,286 +187,8 @@ const initialProjects = [
   }
 ];
 
-// GitHub modal component
-const GitHubModal = ({ 
-  show, 
-  onClose, 
-  token, 
-  setToken, 
-  owner, 
-  setOwner, 
-  repoName, 
-  setRepoName, 
-  onSubmit, 
-  isLoading,
-  githubError 
-}) => {
-  if (!show) return null;
-  
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-8 rounded-lg max-w-md w-full">
-        <h2 className="text-xl font-bold mb-4">Connect to GitHub</h2>
-        
-        <div className="mb-4">
-          <div className="block mb-1">Personal Access Token</div>
-          <input
-            type="password"
-            value={token}
-            onChange={(e) => setToken(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded"
-          />
-          <div className="text-gray-500 text-xs">
-            Create a token with 'repo' scope at{' '}
-            <a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener noreferrer" className="text-blue-500">
-              GitHub Settings
-            </a>
-          </div>
-        </div>
-        
-        <div className="mb-4">
-          <div className="block mb-1">GitHub Username</div>
-          <input
-            type="text"
-            value={owner}
-            onChange={(e) => setOwner(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded"
-          />
-        </div>
-        
-        <div className="mb-4">
-          <div className="block mb-1">Repository Name</div>
-          <input
-            type="text"
-            value={repoName}
-            onChange={(e) => setRepoName(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded"
-          />
-          <div className="text-gray-500 text-xs">
-            A private repository will be created if it doesn't exist
-          </div>
-        </div>
-        
-        {githubError && (
-          <div className="text-red-500 mb-4">
-            {githubError}
-          </div>
-        )}
-        
-        <div className="flex justify-end gap-2">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 border border-gray-300 rounded bg-white"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onSubmit}
-            disabled={isLoading || !token || !owner || !repoName}
-            className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-blue-300"
-          >
-            {isLoading ? 'Connecting...' : 'Connect'}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Course modal component
-const CourseModal = ({
-  show,
-  onClose,
-  course,
-  setCourse,
-  onSubmit,
-  title = "Add New Course"
-}) => {
-  if (!show) return null;
-  
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-8 rounded-lg max-w-md w-full">
-        <h2 className="text-xl font-bold mb-4">{title}</h2>
-        
-        <div className="mb-4">
-          <div className="block mb-1">Course Title*</div>
-          <input
-            type="text"
-            value={course.title}
-            onChange={(e) => setCourse({...course, title: e.target.value})}
-            className="w-full p-2 border border-gray-300 rounded"
-          />
-        </div>
-        
-        <div className="mb-4">
-          <div className="block mb-1">Provider</div>
-          <input
-            type="text"
-            value={course.provider}
-            onChange={(e) => setCourse({...course, provider: e.target.value})}
-            className="w-full p-2 border border-gray-300 rounded"
-            placeholder="Udemy, Pluralsight, etc."
-          />
-        </div>
-        
-        <div className="mb-4">
-          <div className="block mb-1">URL</div>
-          <input
-            type="url"
-            value={course.url}
-            onChange={(e) => setCourse({...course, url: e.target.value})}
-            className="w-full p-2 border border-gray-300 rounded"
-            placeholder="https://..."
-          />
-        </div>
-        
-        <div className="mb-4">
-          <div className="block mb-1">Status</div>
-          <select
-            value={course.status}
-            onChange={(e) => setCourse({...course, status: e.target.value})}
-            className="w-full p-2 border border-gray-300 rounded"
-          >
-            <option value="planned">Planned</option>
-            <option value="in-progress">In Progress</option>
-            <option value="completed">Completed</option>
-          </select>
-        </div>
-        
-        <div className="mb-4">
-          <div className="block mb-1">Notes</div>
-          <textarea
-            value={course.notes}
-            onChange={(e) => setCourse({...course, notes: e.target.value})}
-            className="w-full p-2 border border-gray-300 rounded min-h-24"
-            placeholder="Any notes about this course..."
-          ></textarea>
-        </div>
-        
-        <div className="flex justify-end gap-2">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 border border-gray-300 rounded bg-white"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onSubmit}
-            disabled={!course.title}
-            className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-blue-300"
-          >
-            {title.startsWith("Add") ? "Add Course" : "Update Course"}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Project modal component
-const ProjectModal = ({
-  show,
-  onClose,
-  project,
-  setProject,
-  onSubmit,
-  title = "Add New Project"
-}) => {
-  if (!show) return null;
-  
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-8 rounded-lg max-w-md w-full">
-        <h2 className="text-xl font-bold mb-4">{title}</h2>
-        
-        <div className="mb-4">
-          <div className="block mb-1">Project Title*</div>
-          <input
-            type="text"
-            value={project.title}
-            onChange={(e) => setProject({...project, title: e.target.value})}
-            className="w-full p-2 border border-gray-300 rounded"
-          />
-        </div>
-        
-        <div className="mb-4">
-          <div className="block mb-1">Description</div>
-          <textarea
-            value={project.description}
-            onChange={(e) => setProject({...project, description: e.target.value})}
-            className="w-full p-2 border border-gray-300 rounded min-h-20"
-            placeholder="Brief description of the project..."
-          ></textarea>
-        </div>
-        
-        <div className="mb-4">
-          <div className="block mb-1">Technologies Used</div>
-          <input
-            type="text"
-            value={typeof project.technologies === 'string' ? project.technologies : project.technologies.join(', ')}
-            onChange={(e) => setProject({...project, technologies: e.target.value})}
-            className="w-full p-2 border border-gray-300 rounded"
-            placeholder="Playwright, TypeScript, etc. (comma separated)"
-          />
-        </div>
-        
-        <div className="mb-4">
-          <div className="block mb-1">Status</div>
-          <select
-            value={project.status}
-            onChange={(e) => setProject({...project, status: e.target.value})}
-            className="w-full p-2 border border-gray-300 rounded"
-          >
-            <option value="planned">Planned</option>
-            <option value="in-progress">In Progress</option>
-            <option value="completed">Completed</option>
-          </select>
-        </div>
-        
-        <div className="mb-4">
-          <div className="block mb-1">GitHub URL</div>
-          <input
-            type="url"
-            value={project.githubUrl}
-            onChange={(e) => setProject({...project, githubUrl: e.target.value})}
-            className="w-full p-2 border border-gray-300 rounded"
-            placeholder="https://github.com/..."
-          />
-        </div>
-        
-        <div className="mb-4">
-          <div className="block mb-1">Notes</div>
-          <textarea
-            value={project.notes}
-            onChange={(e) => setProject({...project, notes: e.target.value})}
-            className="w-full p-2 border border-gray-300 rounded min-h-24"
-            placeholder="Any notes about this project..."
-          ></textarea>
-        </div>
-        
-        <div className="flex justify-end gap-2">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 border border-gray-300 rounded bg-white"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onSubmit}
-            disabled={!project.title}
-            className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-blue-300"
-          >
-            {title.startsWith("Add") ? "Add Project" : "Update Project"}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 // Main App Component
-const App = () => {
+function App() {
   // State for skills and UI
   const [skills, setSkills] = useState(() => {
     const savedSkills = localStorage.getItem('qaSkills');
@@ -517,10 +240,10 @@ const App = () => {
 
   // Priority management
   const handlePriorityChange = (category, index, newPriority) => {
-    const updatedSkills = { ...skills };
-    updatedSkills[category][index].priority = newPriority;
-    setSkills(updatedSkills);
-  };
+  const updatedSkills = { ...skills };
+  updatedSkills[category][index].priority = newPriority;
+  setSkills(updatedSkills);
+};
 
   // Save to localStorage
   useEffect(() => {
@@ -599,7 +322,7 @@ const App = () => {
 
   // Delete course
   const deleteCourse = (id) => {
-    if (window.confirm('Are you sure you want to delete this course?')) {
+    if (confirm('Are you sure you want to delete this course?')) {
       setCourses(courses.filter(course => course.id !== id));
     }
   };
@@ -613,12 +336,10 @@ const App = () => {
       id: Date.now(),
       dateAdded: new Date().toISOString(),
       dateCompleted: newProject.status === 'completed' ? new Date().toISOString() : null,
-      technologies: typeof newProject.technologies === 'string' 
-        ? newProject.technologies
-            .split(',')
-            .map(tech => tech.trim())
-            .filter(tech => tech !== '')
-        : newProject.technologies
+      technologies: newProject.technologies
+        .split(',')
+        .map(tech => tech.trim())
+        .filter(tech => tech !== '')
     };
     
     setProjects([...projects, project]);
@@ -649,32 +370,32 @@ const App = () => {
 
   // Delete project
   const deleteProject = (id) => {
-    if (window.confirm('Are you sure you want to delete this project?')) {
+    if (confirm('Are you sure you want to delete this project?')) {
       setProjects(projects.filter(project => project.id !== id));
     }
   };
 
   // Reset all progress
   const resetProgress = () => {
-    if (window.confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
+    if (confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
       setSkills(initialSkills);
       localStorage.removeItem('qaSkills');
     }
   };
 
   // Sort skills by priority
-  const sortByPriority = (skills) => {
-    const priorityOrder = {
-      'high': 1,
-      'medium': 2,
-      'low': 3,
-      'none': 4
-    };
-    
-    return [...skills].sort((a, b) => {
-      return priorityOrder[a.priority] - priorityOrder[b.priority];
-    });
+const sortByPriority = (skills) => {
+  const priorityOrder = {
+    'high': 1,
+    'medium': 2,
+    'low': 3,
+    'none': 4
   };
+  
+  return [...skills].sort((a, b) => {
+    return priorityOrder[a.priority] - priorityOrder[b.priority];
+  });
+};
   
   // Get level label
   const getLevelLabel = (level) => {
@@ -706,72 +427,19 @@ const App = () => {
     };
   };
 
-  // Helper for base64 encoding
-  const b64EncodeUnicode = (str) => {
-    return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) => {
-      return String.fromCharCode(parseInt(p1, 16));
-    }));
-  };
-  
-  // Helper for base64 decoding
-  const b64DecodeUnicode = (str) => {
-    return decodeURIComponent(Array.prototype.map.call(atob(str), (c) => {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
-  };
-
   // GitHub Authentication
   const authenticateWithGitHub = async (tokenVal, ownerVal, repoVal) => {
     try {
       setIsLoading(true);
       setGithubError(null);
       
-      // Test the token by fetching the user info
-      const userResponse = await fetch('https://api.github.com/user', {
-        headers: {
-          'Authorization': `token ${tokenVal}`,
-          'Accept': 'application/vnd.github.v3+json'
-        }
-      });
+      // Create Octokit instance
+      const oktokitInstance = new Octokit.Octokit({ auth: tokenVal });
       
-      if (!userResponse.ok) {
-        throw new Error(`GitHub API error: ${userResponse.status}`);
-      }
+      // Test authentication
+      await oktokitInstance.rest.users.getAuthenticated();
       
-      // Check if repo exists
-      const repoResponse = await fetch(`https://api.github.com/repos/${ownerVal}/${repoVal}`, {
-        headers: {
-          'Authorization': `token ${tokenVal}`,
-          'Accept': 'application/vnd.github.v3+json'
-        }
-      });
-      
-      // If repo doesn't exist, create it
-      if (!repoResponse.ok && repoResponse.status === 404) {
-        // Create repo
-        const createRepoResponse = await fetch('https://api.github.com/user/repos', {
-          method: 'POST',
-          headers: {
-            'Authorization': `token ${tokenVal}`,
-            'Accept': 'application/vnd.github.v3+json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            name: repoVal,
-            description: 'QA Skills Tracker data repository',
-            private: true
-          })
-        });
-        
-        if (!createRepoResponse.ok) {
-          throw new Error(`Failed to create repository: ${createRepoResponse.status}`);
-        }
-      } else if (!repoResponse.ok) {
-        throw new Error(`Repository check failed: ${repoResponse.status}`);
-      }
-      
-      // Store token for later use
-      setOctokit({ token: tokenVal }); 
+      setOctokit(oktokitInstance);
       setRepo({ owner: ownerVal, repo: repoVal });
       setIsAuthenticated(true);
       
@@ -786,14 +454,6 @@ const App = () => {
       setGithubError(`Authentication failed: ${err.message}`);
       setIsLoading(false);
       return false;
-    }
-  };
-
-  // Handle GitHub form submission
-  const handleGitHubSubmit = async () => {
-    const success = await authenticateWithGitHub(token, owner, repoName);
-    if (success) {
-      setShowGitHubModal(false);
     }
   };
 
@@ -841,36 +501,51 @@ const App = () => {
       
       // Try to load skills data
       try {
-        const skillsData = await getFileContent('qa-skills-data.json');
-        if (skillsData) {
-          setSkills(JSON.parse(skillsData));
-          localStorage.setItem('qaSkills', skillsData);
-          loadedAny = true;
-        }
+        const { data } = await octokit.rest.repos.getContent({
+          owner: repo.owner,
+          repo: repo.repo,
+          path: 'qa-skills-data.json'
+        });
+        
+        const content = atob(data.content);
+        const parsedData = JSON.parse(content);
+        setSkills(parsedData);
+        localStorage.setItem('qaSkills', JSON.stringify(parsedData));
+        loadedAny = true;
       } catch (e) {
         console.log('No existing skills data found on GitHub');
       }
       
       // Try to load courses data
       try {
-        const coursesData = await getFileContent('qa-courses-data.json');
-        if (coursesData) {
-          setCourses(JSON.parse(coursesData));
-          localStorage.setItem('qaCourses', coursesData);
-          loadedAny = true;
-        }
+        const { data } = await octokit.rest.repos.getContent({
+          owner: repo.owner,
+          repo: repo.repo,
+          path: 'qa-courses-data.json'
+        });
+        
+        const content = atob(data.content);
+        const parsedData = JSON.parse(content);
+        setCourses(parsedData);
+        localStorage.setItem('qaCourses', JSON.stringify(parsedData));
+        loadedAny = true;
       } catch (e) {
         console.log('No existing courses data found on GitHub');
       }
       
       // Try to load projects data
       try {
-        const projectsData = await getFileContent('qa-projects-data.json');
-        if (projectsData) {
-          setProjects(JSON.parse(projectsData));
-          localStorage.setItem('qaProjects', projectsData);
-          loadedAny = true;
-        }
+        const { data } = await octokit.rest.repos.getContent({
+          owner: repo.owner,
+          repo: repo.repo,
+          path: 'qa-projects-data.json'
+        });
+        
+        const content = atob(data.content);
+        const parsedData = JSON.parse(content);
+        setProjects(parsedData);
+        localStorage.setItem('qaProjects', JSON.stringify(parsedData));
+        loadedAny = true;
       } catch (e) {
         console.log('No existing projects data found on GitHub');
       }
@@ -888,74 +563,35 @@ const App = () => {
     }
   };
 
-  // Helper to get file content from GitHub
-  const getFileContent = async (path) => {
-    const response = await fetch(`https://api.github.com/repos/${repo.owner}/${repo.repo}/contents/${path}`, {
-      headers: {
-        'Authorization': `token ${octokit.token}`,
-        'Accept': 'application/vnd.github.v3+json'
-      }
-    });
-    
-    if (!response.ok) {
-      if (response.status === 404) {
-        return null;
-      }
-      throw new Error(`Failed to get file: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    return b64DecodeUnicode(data.content);
-  };
-
   // Helper to save a file to GitHub
   const saveFile = async (path, content) => {
-    // Check if file exists to get SHA
-    let sha = null;
+    // Check if file exists
+    let sha;
     try {
-      const response = await fetch(`https://api.github.com/repos/${repo.owner}/${repo.repo}/contents/${path}`, {
-        headers: {
-          'Authorization': `token ${octokit.token}`,
-          'Accept': 'application/vnd.github.v3+json'
-        }
+      const { data } = await octokit.rest.repos.getContent({
+        owner: repo.owner,
+        repo: repo.repo,
+        path
       });
-      
-      if (response.ok) {
-        const data = await response.json();
-        sha = data.sha;
-      }
+      sha = data.sha;
     } catch (e) {
       // File doesn't exist yet, which is fine
     }
     
     // Create or update file
-    const payload = {
+    await octokit.rest.repos.createOrUpdateFileContents({
+      owner: repo.owner,
+      repo: repo.repo,
+      path,
       message: `Update ${path} - ${new Date().toISOString()}`,
-      content: b64EncodeUnicode(content)
-    };
-    
-    if (sha) {
-      payload.sha = sha;
-    }
-    
-    const response = await fetch(`https://api.github.com/repos/${repo.owner}/${repo.repo}/contents/${path}`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `token ${octokit.token}`,
-        'Accept': 'application/vnd.github.v3+json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
+      content: btoa(content),
+      sha
     });
-    
-    if (!response.ok) {
-      throw new Error(`Failed to save file: ${response.status}`);
-    }
   };
 
   // Disconnect from GitHub
   const disconnectGitHub = () => {
-    if (window.confirm('Are you sure you want to disconnect from GitHub? Your local progress will be kept.')) {
+    if (confirm('Are you sure you want to disconnect from GitHub? Your local progress will be kept.')) {
       setIsAuthenticated(false);
       setOctokit(null);
       setLastSaved(null);
@@ -999,36 +635,528 @@ const App = () => {
 
   const progress = calculateProgress();
 
+  // GitHub Modal Component
+  const GitHubModal = () => {
+    if (!showGitHubModal) return null;
+    
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      const success = await authenticateWithGitHub(token, owner, repoName);
+      if (success) {
+        setShowGitHubModal(false);
+      }
+    };
+    
+    return (
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 999
+      }}>
+        <div style={{
+          backgroundColor: 'white',
+          padding: '2rem',
+          borderRadius: '0.5rem',
+          maxWidth: '500px',
+          width: '100%'
+        }}>
+          <h2 style={{ marginTop: 0 }}>Connect to GitHub</h2>
+          
+          <form onSubmit={handleSubmit}>
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.25rem' }}>
+                Personal Access Token
+              </label>
+              <input
+                type="password"
+                value={token}
+                onChange={(e) => setToken(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '0.5rem',
+                  border: '1px solid #ddd',
+                  borderRadius: '0.25rem'
+                }}
+                required
+              />
+              <small style={{ color: '#666', fontSize: '0.8rem' }}>
+                Create a token with 'repo' scope at{' '}
+                <a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener noreferrer">
+                  GitHub Settings
+                </a>
+              </small>
+            </div>
+            
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.25rem' }}>
+                GitHub Username
+              </label>
+              <input
+                type="text"
+                value={owner}
+                onChange={(e) => setOwner(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '0.5rem',
+                  border: '1px solid #ddd',
+                  borderRadius: '0.25rem'
+                }}
+                required
+              />
+            </div>
+            
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.25rem' }}>
+                Repository Name
+              </label>
+              <input
+                type="text"
+                value={repoName}
+                onChange={(e) => setRepoName(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '0.5rem',
+                  border: '1px solid #ddd',
+                  borderRadius: '0.25rem'
+                }}
+                required
+              />
+            </div>
+            
+            {githubError && (
+              <div style={{ color: '#ef4444', marginBottom: '1rem' }}>
+                {githubError}
+              </div>
+            )}
+            
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+              <button
+                type="button"
+                onClick={() => setShowGitHubModal(false)}
+                style={{
+                  padding: '0.5rem 1rem',
+                  border: '1px solid #ddd',
+                  borderRadius: '0.25rem',
+                  backgroundColor: 'white',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isLoading}
+                style={{
+                  padding: '0.5rem 1rem',
+                  border: 'none',
+                  borderRadius: '0.25rem',
+                  backgroundColor: '#3b82f6',
+                  color: 'white',
+                  cursor: isLoading ? 'wait' : 'pointer'
+                }}
+              >
+                {isLoading ? 'Connecting...' : 'Connect'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  };
+  
+  // Add Course Modal
+  const AddCourseModal = () => {
+    if (!showAddCourseModal) return null;
+    
+    return (
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 999
+      }}>
+        <div style={{
+          backgroundColor: 'white',
+          padding: '2rem',
+          borderRadius: '0.5rem',
+          maxWidth: '500px',
+          width: '100%'
+        }}>
+          <h2 style={{ marginTop: 0 }}>Add New Course</h2>
+          
+          <form onSubmit={(e) => { e.preventDefault(); addCourse(); }}>
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.25rem' }}>
+                Course Title*
+              </label>
+              <input
+                type="text"
+                value={newCourse.title}
+                onChange={(e) => setNewCourse({...newCourse, title: e.target.value})}
+                style={{
+                  width: '100%',
+                  padding: '0.5rem',
+                  border: '1px solid #ddd',
+                  borderRadius: '0.25rem'
+                }}
+                required
+              />
+            </div>
+            
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.25rem' }}>
+                Provider
+              </label>
+              <input
+                type="text"
+                value={newCourse.provider}
+                onChange={(e) => setNewCourse({...newCourse, provider: e.target.value})}
+                style={{
+                  width: '100%',
+                  padding: '0.5rem',
+                  border: '1px solid #ddd',
+                  borderRadius: '0.25rem'
+                }}
+                placeholder="Udemy, Pluralsight, etc."
+              />
+            </div>
+            
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.25rem' }}>
+                URL
+              </label>
+              <input
+                type="url"
+                value={newCourse.url}
+                onChange={(e) => setNewCourse({...newCourse, url: e.target.value})}
+                style={{
+                  width: '100%',
+                  padding: '0.5rem',
+                  border: '1px solid #ddd',
+                  borderRadius: '0.25rem'
+                }}
+                placeholder="https://..."
+              />
+            </div>
+            
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.25rem' }}>
+                Status
+              </label>
+              <select
+                value={newCourse.status}
+                onChange={(e) => setNewCourse({...newCourse, status: e.target.value})}
+                style={{
+                  width: '100%',
+                  padding: '0.5rem',
+                  border: '1px solid #ddd',
+                  borderRadius: '0.25rem'
+                }}
+              >
+                <option value="planned">Planned</option>
+                <option value="in-progress">In Progress</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+            
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.25rem' }}>
+                Notes
+              </label>
+              <textarea
+                value={newCourse.notes}
+                onChange={(e) => setNewCourse({...newCourse, notes: e.target.value})}
+                style={{
+                  width: '100%',
+                  padding: '0.5rem',
+                  border: '1px solid #ddd',
+                  borderRadius: '0.25rem',
+                  minHeight: '100px'
+                }}
+                placeholder="Any notes about this course..."
+              ></textarea>
+            </div>
+            
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+              <button
+                type="button"
+                onClick={() => setShowAddCourseModal(false)}
+                style={{
+                  padding: '0.5rem 1rem',
+                  border: '1px solid #ddd',
+                  borderRadius: '0.25rem',
+                  backgroundColor: 'white',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                style={{
+                  padding: '0.5rem 1rem',
+                  border: 'none',
+                  borderRadius: '0.25rem',
+                  backgroundColor: '#3b82f6',
+                  color: 'white',
+                  cursor: 'pointer'
+                }}
+              >
+                Add Course
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  };
+  
+  // Add Project Modal
+  const AddProjectModal = () => {
+    if (!showAddProjectModal) return null;
+    
+    return (
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 999
+      }}>
+        <div style={{
+          backgroundColor: 'white',
+          padding: '2rem',
+          borderRadius: '0.5rem',
+          maxWidth: '500px',
+          width: '100%'
+        }}>
+          <h2 style={{ marginTop: 0 }}>Add New Project</h2>
+          
+          <form onSubmit={(e) => { e.preventDefault(); addProject(); }}>
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.25rem' }}>
+                Project Title*
+              </label>
+              <input
+                type="text"
+                value={newProject.title}
+                onChange={(e) => setNewProject({...newProject, title: e.target.value})}
+                style={{
+                  width: '100%',
+                  padding: '0.5rem',
+                  border: '1px solid #ddd',
+                  borderRadius: '0.25rem'
+                }}
+                required
+              />
+            </div>
+            
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.25rem' }}>
+                Description
+              </label>
+              <textarea
+                value={newProject.description}
+                onChange={(e) => setNewProject({...newProject, description: e.target.value})}
+                style={{
+                  width: '100%',
+                  padding: '0.5rem',
+                  border: '1px solid #ddd',
+                  borderRadius: '0.25rem',
+                  minHeight: '80px'
+                }}
+                placeholder="Brief description of the project..."
+              ></textarea>
+            </div>
+            
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.25rem' }}>
+                Technologies Used
+              </label>
+              <input
+                type="text"
+                value={typeof newProject.technologies === 'string' ? newProject.technologies : newProject.technologies.join(', ')}
+                onChange={(e) => setNewProject({...newProject, technologies: e.target.value})}
+                style={{
+                  width: '100%',
+                  padding: '0.5rem',
+                  border: '1px solid #ddd',
+                  borderRadius: '0.25rem'
+                }}
+                placeholder="Playwright, TypeScript, etc. (comma separated)"
+              />
+            </div>
+            
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.25rem' }}>
+                Status
+              </label>
+              <select
+                value={newProject.status}
+                onChange={(e) => setNewProject({...newProject, status: e.target.value})}
+                style={{
+                  width: '100%',
+                  padding: '0.5rem',
+                  border: '1px solid #ddd',
+                  borderRadius: '0.25rem'
+                }}
+              >
+                <option value="planned">Planned</option>
+                <option value="in-progress">In Progress</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+            
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.25rem' }}>
+                GitHub URL
+              </label>
+              <input
+                type="url"
+                value={newProject.githubUrl}
+                onChange={(e) => setNewProject({...newProject, githubUrl: e.target.value})}
+                style={{
+                  width: '100%',
+                  padding: '0.5rem',
+                  border: '1px solid #ddd',
+                  borderRadius: '0.25rem'
+                }}
+                placeholder="https://github.com/..."
+              />
+            </div>
+            
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.25rem' }}>
+                Notes
+              </label>
+              <textarea
+                value={newProject.notes}
+                onChange={(e) => setNewProject({...newProject, notes: e.target.value})}
+                style={{
+                  width: '100%',
+                  padding: '0.5rem',
+                  border: '1px solid #ddd',
+                  borderRadius: '0.25rem',
+                  minHeight: '100px'
+                }}
+                placeholder="Any notes about this project..."
+              ></textarea>
+            </div>
+            
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+              <button
+                type="button"
+                onClick={() => setShowAddProjectModal(false)}
+                style={{
+                  padding: '0.5rem 1rem',
+                  border: '1px solid #ddd',
+                  borderRadius: '0.25rem',
+                  backgroundColor: 'white',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                style={{
+                  padding: '0.5rem 1rem',
+                  border: 'none',
+                  borderRadius: '0.25rem',
+                  backgroundColor: '#3b82f6',
+                  color: 'white',
+                  cursor: 'pointer'
+                }}
+              >
+                Add Project
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  };
+
+   // Update the getPriorityColor function to include the "none" priority
+  const getPriorityColor = (priority) => {
+  switch (priority) {
+    case 'high': return 'text-red-500';
+    case 'medium': return 'text-yellow-500';
+    case 'low': return 'text-green-500';
+    case 'none': return 'text-gray-400';
+    default: return '';
+  }
+};
+
   const renderSkillsTab = () => (
     <>
       {/* Search bar */}
-      <div className="mb-4">
+      <div style={{ marginBottom: '1rem' }}>
         <input
           type="text"
           placeholder="Search skills..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded"
+          style={{
+            width: '100%',
+            padding: '0.5rem',
+            border: '1px solid #ddd',
+            borderRadius: '0.25rem'
+          }}
         />
       </div>
       
       {/* Progress bar */}
-      <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-        <h2 className="text-xl font-bold mb-2">Overall Progress</h2>
-        <div className="h-5 bg-gray-200 rounded-full overflow-hidden mb-2">
-          <div 
-            className="h-full bg-blue-500 transition-all duration-300"
-            style={{ width: `${progress.percent}%` }}
-          ></div>
+      <div className="card" style={{ marginBottom: '1.5rem' }}>
+        <h2>Overall Progress</h2>
+        <div style={{ 
+          height: '20px', 
+          background: '#eee', 
+          borderRadius: '10px',
+          overflow: 'hidden',
+          marginBottom: '0.5rem'
+        }}>
+          <div style={{ 
+            width: `${progress.percent}%`, 
+            height: '100%', 
+            background: '#3b82f6',
+            transition: 'width 0.3s ease'
+          }}></div>
         </div>
-        <div className="flex justify-between text-sm">
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <span>{progress.completed} of {progress.total} skills started</span>
           <span>{progress.percent}% complete</span>
         </div>
-        <div className="mt-4">
+        <div style={{ marginTop: '1rem' }}>
           <button 
             onClick={resetProgress}
-            className="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600"
+            style={{ 
+              background: '#ef4444', 
+              color: 'white',
+              padding: '0.25rem 0.5rem',
+              borderRadius: '4px',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '0.8rem'
+            }}
           >
             Reset All Progress
           </button>
@@ -1036,134 +1164,141 @@ const App = () => {
       </div>
 
       {/* Category tabs */}
-      <div className="flex flex-wrap gap-2 mb-4">
+      <div style={{ marginBottom: '1rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
         {Object.keys(filteredSkills).map(category => (
           <button
             key={category}
-            className={`px-3 py-1 rounded ${activeCategory === category ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            className={`btn ${activeCategory === category ? 'btn-selected' : ''}`}
             onClick={() => setActiveCategory(category)}
           >
             {category.charAt(0).toUpperCase() + category.slice(1)}
           </button>
         ))}
       </div>
-      
       {/* Skills list */}
-      <div className="space-y-4">
-        {filteredSkills[activeCategory] && filteredSkills[activeCategory].length > 0 ? (
-          sortByPriority(filteredSkills[activeCategory]).map((skill, index) => (
-            <div key={index} className="bg-white p-4 rounded-lg shadow-md">
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-lg font-semibold">{skill.name}</h3>
-                <div>
-                  <select
-                    value={skill.priority}
-                    onChange={(e) => handlePriorityChange(activeCategory, skills[activeCategory].findIndex(s => s.name === skill.name), e.target.value)}
-                    className={`p-1 rounded text-sm border ${
-                      skill.priority === 'high' ? 'bg-red-100 text-red-700 border-red-200' : 
-                      skill.priority === 'medium' ? 'bg-yellow-100 text-yellow-700 border-yellow-200' : 
-                      skill.priority === 'low' ? 'bg-green-100 text-green-700 border-green-200' : 
-                      'bg-gray-100 text-gray-700 border-gray-200'
-                    }`}
-                  >
-                    <option value="high">High priority</option>
-                    <option value="medium">Medium priority</option>
-                    <option value="low">Low priority</option>
-                    <option value="none">No priority</option>
-                  </select>
-                </div>
-              </div>
-            
-              <div>
-                <p className="mb-2">Proficiency: <strong>{getLevelLabel(skill.level)}</strong></p>
-                <div className="flex gap-2">
-                  {[0, 1, 2, 3].map(level => (
-                    <button
-                      key={level}
-                      onClick={() => handleLevelChange(activeCategory, skills[activeCategory].findIndex(s => s.name === skill.name), level)}
-                      title={getLevelLabel(level)}
-                      className={`w-8 h-8 border rounded flex items-center justify-center ${
-                        level === 0 ? 'bg-gray-100' :
-                        level === 1 && skill.level >= 1 ? 'bg-green-100 border-green-300' : 
-                        level === 2 && skill.level >= 2 ? 'bg-blue-100 border-blue-300' : 
-                        level === 3 && skill.level >= 3 ? 'bg-purple-100 border-purple-300' :
-                        'bg-gray-100'
-                      }`}
-                    >
-                      {skill.level >= level && level > 0 ? '✓' : ''}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Resources section */}
-              {skill.resources && skill.resources.length > 0 && (
-                <div className="mt-4">
-                  <h4 className="text-sm font-semibold mb-1">Learning Resources:</h4>
-                  <ul className="pl-6 list-disc">
-                    {skill.resources.map((resource, idx) => (
-                      <li key={idx}>
-                        <a 
-                          href={resource.url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-500 hover:underline"
-                        >
-                          {resource.title}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          ))
-        ) : (
-          <div className="text-center py-8 text-gray-500">
-            {searchTerm ? 'No skills match your search.' : 'No skills in this category.'}
+  <div>
+  {filteredSkills[activeCategory] && filteredSkills[activeCategory].length > 0 ? (
+    sortByPriority(filteredSkills[activeCategory]).map((skill, index) => (
+      <div key={index} className="card">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+          <h3 style={{ margin: 0 }}>{skill.name}</h3>
+          <div>
+            <select
+              value={skill.priority}
+              onChange={(e) => handlePriorityChange(activeCategory, skills[activeCategory].findIndex(s => s.name === skill.name), e.target.value)}
+              style={{
+                padding: '0.2rem 0.5rem',
+                borderRadius: '0.25rem',
+                fontSize: '0.8rem',
+                border: '1px solid #ddd',
+                marginRight: '0.5rem',
+                backgroundColor: skill.priority === 'high' ? '#fee2e2' : 
+                                skill.priority === 'medium' ? '#fef3c7' : 
+                                skill.priority === 'low' ? '#d1fae5' : '#f3f4f6',
+                color: skill.priority === 'high' ? '#b91c1c' : 
+                      skill.priority === 'medium' ? '#92400e' : 
+                      skill.priority === 'low' ? '#065f46' : '#6b7280'
+              }}
+            >
+              <option value="high">High priority</option>
+              <option value="medium">Medium priority</option>
+              <option value="low">Low priority</option>
+              <option value="none">No priority</option>
+            </select>
           </div>
-        )}
+        </div>
+      
+      <div>
+        <p>Proficiency: <strong>{getLevelLabel(skill.level)}</strong></p>
+        <div>
+          {[0, 1, 2, 3].map(level => (
+            <button
+              key={level}
+              onClick={() => handleLevelChange(activeCategory, skills[activeCategory].findIndex(s => s.name === skill.name), level)}
+              title={getLevelLabel(level)}
+              className={`skill-level ${skill.level >= level && level > 0 ? `level-${level}` : ''}`}
+              style={{ cursor: 'pointer' }}
+            >
+              {skill.level >= level && level > 0 ? '✓' : ''}
+            </button>
+          ))}
+        </div>
       </div>
+      
+      {/* Resources section */}
+      {skill.resources && skill.resources.length > 0 && (
+        <div style={{ marginTop: '1rem' }}>
+          <h4 style={{ fontSize: '0.9rem', margin: '0 0 0.25rem 0' }}>Learning Resources:</h4>
+          <ul style={{ margin: 0, paddingLeft: '1.5rem' }}>
+            {skill.resources.map((resource, idx) => (
+              <li key={idx}>
+                <a 
+                  href={resource.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{ color: '#3b82f6' }}
+                >
+                  {resource.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+   </div>
+    ))
+  ) : (
+    <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+      {searchTerm ? 'No skills match your search.' : 'No skills in this category.'}
+    </div>
+  )}
+</div>
     </>
   );
   
   const renderCoursesTab = () => (
     <>
       {/* Search and add */}
-      <div className="flex justify-between mb-4">
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
         <input
           type="text"
           placeholder="Search courses..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-2/3 p-2 border border-gray-300 rounded"
+          style={{
+            width: '70%',
+            padding: '0.5rem',
+            border: '1px solid #ddd',
+            borderRadius: '0.25rem'
+          }}
         />
         <button
           onClick={() => setShowAddCourseModal(true)}
-          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+          className="btn"
+          style={{ backgroundColor: '#10b981' }}
         >
           Add Course
         </button>
       </div>
       
       {/* Courses stats */}
-      <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-        <h2 className="text-xl font-bold mb-2">Courses Summary</h2>
-        <div className="flex justify-around text-center mt-4">
+      <div className="card" style={{ marginBottom: '1.5rem' }}>
+        <h2>Courses Summary</h2>
+        <div style={{ display: 'flex', justifyContent: 'space-around', textAlign: 'center', marginTop: '1rem' }}>
           <div>
-            <div className="text-4xl font-bold text-blue-500">
+            <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#3b82f6' }}>
               {courses.filter(c => c.status === 'completed').length}
             </div>
             <div>Completed</div>
           </div>
           <div>
-            <div className="text-4xl font-bold text-yellow-500">
+            <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#f59e0b' }}>
               {courses.filter(c => c.status === 'in-progress').length}
             </div>
             <div>In Progress</div>
           </div>
           <div>
-            <div className="text-4xl font-bold text-gray-500">
+            <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#6b7280' }}>
               {courses.filter(c => c.status === 'planned').length}
             </div>
             <div>Planned</div>
@@ -1172,64 +1307,88 @@ const App = () => {
       </div>
       
       {/* Courses list */}
-      <div className="space-y-4">
+      <div>
         {filteredCourses.length > 0 ? (
           filteredCourses.map(course => (
-            <div key={course.id} className="bg-white p-4 rounded-lg shadow-md">
-              <div className="flex justify-between items-start">
+            <div key={course.id} className="card">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
-                  <h3 className="text-lg font-semibold mb-1">{course.title}</h3>
+                  <h3 style={{ margin: '0 0 0.25rem 0' }}>{course.title}</h3>
                   {course.provider && (
-                    <div className="text-sm text-gray-600 mb-2">
+                    <div style={{ fontSize: '0.9rem', color: '#4b5563', marginBottom: '0.5rem' }}>
                       Provider: {course.provider}
                     </div>
                   )}
                 </div>
-                <span className={`px-2 py-1 rounded-full text-xs ${
-                  course.status === 'completed' ? 'bg-green-100 text-green-800' : 
-                  course.status === 'in-progress' ? 'bg-yellow-100 text-yellow-800' : 
-                  'bg-gray-100 text-gray-800'
-                }`}>
+                <span style={{ 
+                  padding: '0.2rem 0.5rem', 
+                  borderRadius: '1rem', 
+                  fontSize: '0.8rem',
+                  backgroundColor: course.status === 'completed' ? '#d1fae5' : 
+                                  course.status === 'in-progress' ? '#fef3c7' : '#f3f4f6',
+                  color: course.status === 'completed' ? '#065f46' : 
+                         course.status === 'in-progress' ? '#92400e' : '#1f2937'
+                }}>
                   {course.status === 'completed' ? 'Completed' : 
                    course.status === 'in-progress' ? 'In Progress' : 'Planned'}
                 </span>
               </div>
               
               {course.url && (
-                <div className="mt-2 mb-2">
+                <div style={{ margin: '0.5rem 0' }}>
                   <a 
                     href={course.url} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-blue-500 hover:underline flex items-center"
+                    style={{ color: '#3b82f6', display: 'inline-flex', alignItems: 'center' }}
                   >
                     Course Link
-                    <span className="ml-1">↗</span>
+                    <span style={{ marginLeft: '0.25rem' }}>↗</span>
                   </a>
                 </div>
               )}
               
               {course.notes && (
-                <div className="mt-2 mb-2 p-2 bg-gray-50 border-l-4 border-gray-200 text-sm">
+                <div style={{ 
+                  margin: '0.5rem 0', 
+                  padding: '0.5rem',
+                  backgroundColor: '#f9fafb',
+                  borderLeft: '4px solid #e5e7eb',
+                  fontSize: '0.9rem'
+                }}>
                   <strong>Notes:</strong> {course.notes}
                 </div>
               )}
               
-              <div className="flex justify-between mt-4 text-xs text-gray-500">
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between',
+                marginTop: '1rem',
+                fontSize: '0.8rem',
+                color: '#6b7280'
+              }}>
                 <div>
                   Added: {new Date(course.dateAdded).toLocaleDateString()}
                   {course.dateCompleted && (
-                    <span className="ml-4">
+                    <span style={{ marginLeft: '1rem' }}>
                       Completed: {new Date(course.dateCompleted).toLocaleDateString()}
                     </span>
                   )}
                 </div>
                 
-                <div className="flex gap-2">
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
                   {course.status !== 'completed' && (
                     <button
                       onClick={() => updateCourseStatus(course.id, 'completed')}
-                      className="px-2 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600"
+                      style={{ 
+                        padding: '0.25rem 0.5rem',
+                        backgroundColor: '#10b981',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '0.25rem',
+                        cursor: 'pointer',
+                        fontSize: '0.8rem'
+                      }}
                     >
                       Mark Complete
                     </button>
@@ -1238,7 +1397,15 @@ const App = () => {
                   {course.status === 'planned' && (
                     <button
                       onClick={() => updateCourseStatus(course.id, 'in-progress')}
-                      className="px-2 py-1 bg-yellow-500 text-white rounded text-xs hover:bg-yellow-600"
+                      style={{ 
+                        padding: '0.25rem 0.5rem',
+                        backgroundColor: '#f59e0b',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '0.25rem',
+                        cursor: 'pointer',
+                        fontSize: '0.8rem'
+                      }}
                     >
                       Start Course
                     </button>
@@ -1246,7 +1413,15 @@ const App = () => {
                   
                   <button
                     onClick={() => deleteCourse(course.id)}
-                    className="px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600"
+                    style={{ 
+                      padding: '0.25rem 0.5rem',
+                      backgroundColor: '#ef4444',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '0.25rem',
+                      cursor: 'pointer',
+                      fontSize: '0.8rem'
+                    }}
                   >
                     Delete
                   </button>
@@ -1255,7 +1430,7 @@ const App = () => {
             </div>
           ))
         ) : (
-          <div className="text-center py-8 text-gray-500">
+          <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
             {searchTerm ? 'No courses match your search.' : 'No courses added yet.'}
           </div>
         )}
@@ -1266,40 +1441,46 @@ const App = () => {
   const renderProjectsTab = () => (
     <>
       {/* Search and add */}
-      <div className="flex justify-between mb-4">
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
         <input
           type="text"
           placeholder="Search projects..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-2/3 p-2 border border-gray-300 rounded"
+          style={{
+            width: '70%',
+            padding: '0.5rem',
+            border: '1px solid #ddd',
+            borderRadius: '0.25rem'
+          }}
         />
         <button
           onClick={() => setShowAddProjectModal(true)}
-          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+          className="btn"
+          style={{ backgroundColor: '#10b981' }}
         >
           Add Project
         </button>
       </div>
       
       {/* Projects stats */}
-      <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-        <h2 className="text-xl font-bold mb-2">Projects Summary</h2>
-        <div className="flex justify-around text-center mt-4">
+      <div className="card" style={{ marginBottom: '1.5rem' }}>
+        <h2>Projects Summary</h2>
+        <div style={{ display: 'flex', justifyContent: 'space-around', textAlign: 'center', marginTop: '1rem' }}>
           <div>
-            <div className="text-4xl font-bold text-blue-500">
+            <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#3b82f6' }}>
               {projects.filter(p => p.status === 'completed').length}
             </div>
             <div>Completed</div>
           </div>
           <div>
-            <div className="text-4xl font-bold text-yellow-500">
+            <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#f59e0b' }}>
               {projects.filter(p => p.status === 'in-progress').length}
             </div>
             <div>In Progress</div>
           </div>
           <div>
-            <div className="text-4xl font-bold text-gray-500">
+            <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#6b7280' }}>
               {projects.filter(p => p.status === 'planned').length}
             </div>
             <div>Planned</div>
@@ -1308,40 +1489,49 @@ const App = () => {
       </div>
       
       {/* Projects list */}
-      <div className="space-y-4">
+      <div>
         {filteredProjects.length > 0 ? (
           filteredProjects.map(project => (
-            <div key={project.id} className="bg-white p-4 rounded-lg shadow-md">
-              <div className="flex justify-between items-start">
+            <div key={project.id} className="card">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
-                  <h3 className="text-lg font-semibold mb-1">{project.title}</h3>
+                  <h3 style={{ margin: '0 0 0.25rem 0' }}>{project.title}</h3>
                 </div>
-                <span className={`px-2 py-1 rounded-full text-xs ${
-                  project.status === 'completed' ? 'bg-green-100 text-green-800' : 
-                  project.status === 'in-progress' ? 'bg-yellow-100 text-yellow-800' : 
-                  'bg-gray-100 text-gray-800'
-                }`}>
+                <span style={{ 
+                  padding: '0.2rem 0.5rem', 
+                  borderRadius: '1rem', 
+                  fontSize: '0.8rem',
+                  backgroundColor: project.status === 'completed' ? '#d1fae5' : 
+                                  project.status === 'in-progress' ? '#fef3c7' : '#f3f4f6',
+                  color: project.status === 'completed' ? '#065f46' : 
+                         project.status === 'in-progress' ? '#92400e' : '#1f2937'
+                }}>
                   {project.status === 'completed' ? 'Completed' : 
                    project.status === 'in-progress' ? 'In Progress' : 'Planned'}
                 </span>
               </div>
               
               {project.description && (
-                <div className="mt-2 mb-2 text-sm">
+                <div style={{ margin: '0.5rem 0', fontSize: '0.9rem' }}>
                   {project.description}
                 </div>
               )}
               
               {project.technologies && project.technologies.length > 0 && (
-                <div className="mt-2 mb-2">
-                  <div className="text-xs text-gray-600 mb-1">
+                <div style={{ margin: '0.5rem 0' }}>
+                  <div style={{ fontSize: '0.8rem', color: '#4b5563', marginBottom: '0.25rem' }}>
                     Technologies:
                   </div>
-                  <div className="flex flex-wrap gap-1">
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
                     {project.technologies.map((tech, idx) => (
                       <span
                         key={idx}
-                        className="px-2 py-1 bg-gray-200 rounded-full text-xs"
+                        style={{
+                          padding: '0.15rem 0.5rem',
+                          backgroundColor: '#e5e7eb',
+                          borderRadius: '1rem',
+                          fontSize: '0.8rem'
+                        }}
                       >
                         {tech}
                       </span>
@@ -1351,40 +1541,60 @@ const App = () => {
               )}
               
               {project.githubUrl && (
-                <div className="mt-2 mb-2">
+                <div style={{ margin: '0.5rem 0' }}>
                   <a 
                     href={project.githubUrl} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-blue-500 hover:underline flex items-center"
+                    style={{ color: '#3b82f6', display: 'inline-flex', alignItems: 'center' }}
                   >
                     GitHub Repository
-                    <span className="ml-1">↗</span>
+                    <span style={{ marginLeft: '0.25rem' }}>↗</span>
                   </a>
                 </div>
               )}
               
               {project.notes && (
-                <div className="mt-2 mb-2 p-2 bg-gray-50 border-l-4 border-gray-200 text-sm">
+                <div style={{ 
+                  margin: '0.5rem 0', 
+                  padding: '0.5rem',
+                  backgroundColor: '#f9fafb',
+                  borderLeft: '4px solid #e5e7eb',
+                  fontSize: '0.9rem'
+                }}>
                   <strong>Notes:</strong> {project.notes}
                 </div>
               )}
               
-              <div className="flex justify-between mt-4 text-xs text-gray-500">
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between',
+                marginTop: '1rem',
+                fontSize: '0.8rem',
+                color: '#6b7280'
+              }}>
                 <div>
                   Added: {new Date(project.dateAdded).toLocaleDateString()}
                   {project.dateCompleted && (
-                    <span className="ml-4">
+                    <span style={{ marginLeft: '1rem' }}>
                       Completed: {new Date(project.dateCompleted).toLocaleDateString()}
                     </span>
                   )}
                 </div>
                 
-                <div className="flex gap-2">
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
                   {project.status !== 'completed' && (
                     <button
                       onClick={() => updateProjectStatus(project.id, 'completed')}
-                      className="px-2 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600"
+                      style={{ 
+                        padding: '0.25rem 0.5rem',
+                        backgroundColor: '#10b981',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '0.25rem',
+                        cursor: 'pointer',
+                        fontSize: '0.8rem'
+                      }}
                     >
                       Mark Complete
                     </button>
@@ -1393,7 +1603,15 @@ const App = () => {
                   {project.status === 'planned' && (
                     <button
                       onClick={() => updateProjectStatus(project.id, 'in-progress')}
-                      className="px-2 py-1 bg-yellow-500 text-white rounded text-xs hover:bg-yellow-600"
+                      style={{ 
+                        padding: '0.25rem 0.5rem',
+                        backgroundColor: '#f59e0b',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '0.25rem',
+                        cursor: 'pointer',
+                        fontSize: '0.8rem'
+                      }}
                     >
                       Start Project
                     </button>
@@ -1401,7 +1619,15 @@ const App = () => {
                   
                   <button
                     onClick={() => deleteProject(project.id)}
-                    className="px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600"
+                    style={{ 
+                      padding: '0.25rem 0.5rem',
+                      backgroundColor: '#ef4444',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '0.25rem',
+                      cursor: 'pointer',
+                      fontSize: '0.8rem'
+                    }}
                   >
                     Delete
                   </button>
@@ -1410,7 +1636,7 @@ const App = () => {
             </div>
           ))
         ) : (
-          <div className="text-center py-8 text-gray-500">
+          <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
             {searchTerm ? 'No projects match your search.' : 'No projects added yet.'}
           </div>
         )}
@@ -1419,37 +1645,50 @@ const App = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-blue-600 text-white py-6 mb-6">
-        <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold">QA Skills Development Tracker</h1>
-          <p className="text-blue-100">Track your journey to becoming a QA automation expert</p>
+    <div>
+      <header>
+        <div className="container">
+          <h1>QA Skills Development Tracker</h1>
+          <p>Track your journey to becoming a QA automation expert</p>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 pb-8">
+      <div className="container">
         {/* GitHub Integration */}
-        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-          <h2 className="text-xl font-bold mb-2">GitHub Sync</h2>
+        <div className="card" style={{ marginBottom: '1.5rem' }}>
+          <h2>GitHub Sync</h2>
           
           {isAuthenticated ? (
             <div>
-              <div className="flex items-center mb-4 text-green-600">
-                <span className="w-4 h-4 bg-green-600 rounded-full mr-2"></span>
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                marginBottom: '1rem',
+                color: '#16a34a'
+              }}>
+                <span style={{ 
+                  display: 'inline-block',
+                  width: '16px',
+                  height: '16px',
+                  borderRadius: '50%',
+                  backgroundColor: '#16a34a',
+                  marginRight: '0.5rem'
+                }}></span>
                 <span>Connected to GitHub: {repo.owner}/{repo.repo}</span>
               </div>
               
               {lastSaved && (
-                <div className="mb-2 text-sm">
+                <div style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>
                   Last saved: {lastSaved.toLocaleString()}
                 </div>
               )}
               
-              <div className="flex gap-2">
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
                 <button
                   onClick={loadFromGitHub}
                   disabled={isLoading}
-                  className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-blue-300"
+                  className="btn"
+                  style={{ backgroundColor: '#3b82f6' }}
                 >
                   {isLoading ? 'Loading...' : 'Load from GitHub'}
                 </button>
@@ -1457,31 +1696,34 @@ const App = () => {
                 <button
                   onClick={saveToGitHub}
                   disabled={isLoading}
-                  className="px-4 py-2 bg-green-500 text-white rounded disabled:bg-green-300"
+                  className="btn"
+                  style={{ backgroundColor: '#16a34a' }}
                 >
                   {isLoading ? 'Saving...' : 'Save to GitHub'}
                 </button>
                 
                 <button
                   onClick={disconnectGitHub}
-                  className="px-4 py-2 bg-gray-500 text-white rounded"
+                  className="btn"
+                  style={{ backgroundColor: '#6b7280' }}
                 >
                   Disconnect
                 </button>
               </div>
               
               {githubError && (
-                <div className="text-red-500 mt-2 text-sm">
+                <div style={{ color: '#ef4444', marginTop: '0.5rem', fontSize: '0.9rem' }}>
                   {githubError}
                 </div>
               )}
             </div>
           ) : (
             <div>
-              <p className="mb-2">Connect to GitHub to save your progress and access it from any device.</p>
+              <p>Connect to GitHub to save your progress and access it from any device.</p>
               <button
                 onClick={() => setShowGitHubModal(true)}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                className="btn"
+                style={{ backgroundColor: '#3b82f6', marginTop: '0.5rem' }}
               >
                 Connect to GitHub
               </button>
@@ -1490,23 +1732,35 @@ const App = () => {
         </div>
 
         {/* Main tabs */}
-        <div className="mb-6">
-          <div className="flex border-b border-gray-200">
+        <div style={{ marginBottom: '1.5rem' }}>
+          <div style={{ display: 'flex', borderBottom: '1px solid #e5e7eb' }}>
             <button
-              className={`px-4 py-2 font-medium ${activeTab === 'skills' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'}`}
+              className={`btn ${activeTab === 'skills' ? 'btn-selected' : ''}`}
               onClick={() => { setActiveTab('skills'); setSearchTerm(''); }}
+              style={{ 
+                borderRadius: '0.25rem 0.25rem 0 0',
+                borderBottom: activeTab === 'skills' ? '3px solid #3b82f6' : 'none'
+              }}
             >
               Skills
             </button>
             <button
-              className={`px-4 py-2 font-medium ${activeTab === 'courses' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'}`}
+              className={`btn ${activeTab === 'courses' ? 'btn-selected' : ''}`}
               onClick={() => { setActiveTab('courses'); setSearchTerm(''); }}
+              style={{ 
+                borderRadius: '0.25rem 0.25rem 0 0',
+                borderBottom: activeTab === 'courses' ? '3px solid #3b82f6' : 'none'
+              }}
             >
               Courses
             </button>
             <button
-              className={`px-4 py-2 font-medium ${activeTab === 'projects' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'}`}
+              className={`btn ${activeTab === 'projects' ? 'btn-selected' : ''}`}
               onClick={() => { setActiveTab('projects'); setSearchTerm(''); }}
+              style={{ 
+                borderRadius: '0.25rem 0.25rem 0 0',
+                borderBottom: activeTab === 'projects' ? '3px solid #3b82f6' : 'none'
+              }}
             >
               Projects
             </button>
@@ -1519,44 +1773,26 @@ const App = () => {
         {activeTab === 'projects' && renderProjectsTab()}
         
         {/* Footer */}
-        <div className="mt-8 pt-4 text-center text-gray-500 text-sm border-t border-gray-200">
+        <div style={{ 
+          margin: '2rem 0', 
+          padding: '1rem', 
+          textAlign: 'center',
+          borderTop: '1px solid #ddd',
+          color: '#666',
+          fontSize: '0.9rem'
+        }}>
           Your progress is automatically saved in your browser's local storage.
           {isAuthenticated && " You can also save to GitHub for backup and cross-device access."}
         </div>
       </div>
       
       {/* Modals */}
-      <GitHubModal 
-        show={showGitHubModal}
-        onClose={() => setShowGitHubModal(false)}
-        token={token}
-        setToken={setToken}
-        owner={owner}
-        setOwner={setOwner}
-        repoName={repoName}
-        setRepoName={setRepoName}
-        onSubmit={handleGitHubSubmit}
-        isLoading={isLoading}
-        githubError={githubError}
-      />
-      
-      <CourseModal
-        show={showAddCourseModal}
-        onClose={() => setShowAddCourseModal(false)}
-        course={newCourse}
-        setCourse={setNewCourse}
-        onSubmit={addCourse}
-      />
-      
-      <ProjectModal
-        show={showAddProjectModal}
-        onClose={() => setShowAddProjectModal(false)}
-        project={newProject}
-        setProject={setNewProject}
-        onSubmit={addProject}
-      />
+      <GitHubModal />
+      <AddCourseModal />
+      <AddProjectModal />
     </div>
   );
-};
+}
 
-export default App;
+// Render the app
+ReactDOM.render(<App />, document.getElementById('root'));
