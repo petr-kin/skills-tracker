@@ -434,7 +434,7 @@ const sortByPriority = (skills) => {
       setGithubError(null);
       
       // Create Octokit instance
-      const oktokitInstance = new Octokit.Octokit({ auth: tokenVal });
+      const oktokitInstance = new Octokit({ auth: tokenVal });
       
       // Test authentication
       await oktokitInstance.rest.users.getAuthenticated();
