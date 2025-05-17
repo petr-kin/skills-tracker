@@ -4,91 +4,157 @@ const { useState, useEffect } = React;
 // Initial skills data (expanded)
 const initialSkills = {
   frameworks: [
-    { name: 'Playwright', level: 0, priority: 'high', resources: [
-      { title: 'Playwright Official Docs', url: 'https://playwright.dev/docs/intro' }
-    ]},
-    { name: 'Selenium', level: 0, priority: 'high', resources: [] },
-    { name: 'Cypress', level: 0, priority: 'medium', resources: [] },
-    { name: 'WebdriverIO', level: 0, priority: 'medium', resources: [] },
-    { name: 'TestCafe', level: 0, priority: 'low', resources: [] },
-    { name: 'Puppeteer', level: 0, priority: 'medium', resources: [] },
-    { name: 'Appium', level: 0, priority: 'medium', resources: [] },
-    { name: 'Robot Framework', level: 0, priority: 'low', resources: [] },
-    { name: 'Cucumber', level: 0, priority: 'medium', resources: [] },
-    { name: 'JUnit', level: 0, priority: 'medium', resources: [] },
-    { name: 'TestNG', level: 0, priority: 'low', resources: [] }
-  ],
-  languages: [
-    { name: 'JavaScript', level: 0, priority: 'high', resources: [] },
-    { name: 'TypeScript', level: 0, priority: 'high', resources: [] },
-    { name: 'Python', level: 0, priority: 'medium', resources: [] },
-    { name: 'Java', level: 0, priority: 'medium', resources: [] },
-    { name: 'C#', level: 0, priority: 'low', resources: [] },
-    { name: 'Ruby', level: 0, priority: 'low', resources: [] },
-    { name: 'Groovy', level: 0, priority: 'low', resources: [] },
-    { name: 'Go', level: 0, priority: 'low', resources: [] },
-    { name: 'SQL', level: 0, priority: 'medium', resources: [] }
-  ],
+  // 🧪 Browser & Web UI Testing
+  { name: 'Selenium', level: 0, priority: 'high', resources: [] },
+  { name: 'Playwright', level: 0, priority: 'high', resources: [
+    { title: 'Playwright Official Docs', url: 'https://playwright.dev/docs/intro' }
+  ]},
+  { name: 'Cypress', level: 0, priority: 'high', resources: [] },
+  { name: 'WebdriverIO', level: 0, priority: 'medium', resources: [] },
+  { name: 'TestCafe', level: 0, priority: 'low', resources: [] },
+
+  // 📱 Mobile Testing
+  { name: 'Appium', level: 0, priority: 'high', resources: [] },
+
+  // 🔗 API & Integration Testing
+  { name: 'Postman', level: 0, priority: 'high', resources: [] },
+  { name: 'RestAssured', level: 0, priority: 'medium', resources: [] },
+  { name: 'SuperTest', level: 0, priority: 'medium', resources: [] },
+  { name: 'Karate DSL', level: 0, priority: 'medium', resources: [] },
+
+  // 💬 BDD & DSL Frameworks
+  { name: 'Cucumber', level: 0, priority: 'high', resources: [] },
+  { name: 'Robot Framework', level: 0, priority: 'medium', resources: [] },
+  { name: 'pytest-bdd', level: 0, priority: 'medium', resources: [] },
+
+  // ⚙️ Unit & Component Testing
+  { name: 'JUnit', level: 0, priority: 'medium', resources: [] },
+  { name: 'TestNG', level: 0, priority: 'medium', resources: [] },
+  { name: 'Jest', level: 0, priority: 'medium', resources: [] },
+  { name: 'Mocha', level: 0, priority: 'medium', resources: [] },
+  { name: 'Chai', level: 0, priority: 'low', resources: [] },
+  { name: 'QUnit', level: 0, priority: 'low', resources: [] },
+
+  // 📊 Reporting & Analysis
+  { name: 'Allure Reporting', level: 0, priority: 'medium', resources: [] }
+],
+ languages: [
+  // 🔤 Frontend & Scripting
+  { name: 'JavaScript', level: 0, priority: 'high', resources: [] },
+  { name: 'TypeScript', level: 0, priority: 'high', resources: [] },
+  { name: 'Python', level: 0, priority: 'medium', resources: [] },
+  { name: 'Java', level: 0, priority: 'medium', resources: [] },
+
+  // 💼 Backend & Enterprise
+  { name: 'C#', level: 0, priority: 'low', resources: [] },
+  { name: 'Ruby', level: 0, priority: 'low', resources: [] },
+  { name: 'Go', level: 0, priority: 'low', resources: [] },
+
+  // 📄 Infrastructure & Scripting
+  { name: 'Groovy', level: 0, priority: 'low', resources: [] },
+  { name: 'YAML', level: 0, priority: 'medium', resources: [] },
+
+  // 🧠 Database & Queries
+  { name: 'SQL', level: 0, priority: 'medium', resources: [] }
+],
   testingSkills: [
-    { name: 'API Testing', level: 0, priority: 'high', resources: [] },
-    { name: 'Performance Testing', level: 0, priority: 'medium', resources: [] },
-    { name: 'Mobile Testing', level: 0, priority: 'medium', resources: [] },
-    { name: 'Security Testing', level: 0, priority: 'medium', resources: [] },
-    { name: 'Accessibility Testing', level: 0, priority: 'medium', resources: [] },
-    { name: 'Visual Regression Testing', level: 0, priority: 'medium', resources: [] },
-    { name: 'Contract Testing', level: 0, priority: 'medium', resources: [] },
-    { name: 'Load Testing', level: 0, priority: 'medium', resources: [] },
-    { name: 'E2E Testing', level: 0, priority: 'high', resources: [] },
-    { name: 'Component Testing', level: 0, priority: 'high', resources: [] },
-    { name: 'Unit Testing', level: 0, priority: 'high', resources: [] },
-    { name: 'Test Data Management', level: 0, priority: 'high', resources: [] },
-    { name: 'Mock/Stub Services', level: 0, priority: 'high', resources: [] }
-  ],
+  // 🧪 Core QA Skills
+  { name: 'API Testing', level: 0, priority: 'high', resources: [] },
+  { name: 'E2E Testing', level: 0, priority: 'high', resources: [] },
+  { name: 'Component Testing', level: 0, priority: 'high', resources: [] },
+  { name: 'Unit Testing', level: 0, priority: 'high', resources: [] },
+  { name: 'Test Data Management', level: 0, priority: 'high', resources: [] },
+  { name: 'Mock/Stub Services', level: 0, priority: 'high', resources: [] },
+
+  // ⚡️ Advanced Testing Areas
+  { name: 'Performance Testing', level: 0, priority: 'medium', resources: [] },
+  { name: 'Load Testing', level: 0, priority: 'medium', resources: [] },
+  { name: 'Security Testing', level: 0, priority: 'medium', resources: [] },
+  { name: 'Contract Testing', level: 0, priority: 'medium', resources: [] },
+  { name: 'Mobile Testing', level: 0, priority: 'medium', resources: [] },
+
+  // 🎨 UI & Accessibility
+  { name: 'Visual Regression Testing', level: 0, priority: 'medium', resources: [] },
+  { name: 'Accessibility Testing', level: 0, priority: 'medium', resources: [] }
+],
   methodologies: [
-    { name: 'Agile/Scrum', level: 0, priority: 'high', resources: [] },
-    { name: 'BDD', level: 0, priority: 'medium', resources: [] },
-    { name: 'TDD', level: 0, priority: 'high', resources: [] },
-    { name: 'CI/CD', level: 0, priority: 'high', resources: [] },
-    { name: 'DevOps', level: 0, priority: 'medium', resources: [] },
-    { name: 'Shift-Left Testing', level: 0, priority: 'medium', resources: [] },
-    { name: 'Test Automation Pyramid', level: 0, priority: 'high', resources: [] },
-    { name: 'Page Object Model', level: 0, priority: 'high', resources: [] },
-    { name: 'Data-Driven Testing', level: 0, priority: 'high', resources: [] },
-    { name: 'Risk-Based Testing', level: 0, priority: 'medium', resources: [] },
-    { name: 'Exploratory Testing', level: 0, priority: 'medium', resources: [] }
-  ],
+  // 📈 Development Strategies
+  { name: 'Agile/Scrum', level: 0, priority: 'high', resources: [] },
+  { name: 'TDD', level: 0, priority: 'high', resources: [] },
+  { name: 'BDD', level: 0, priority: 'medium', resources: [] },
+
+  // 🔄 DevOps Practices
+  { name: 'CI/CD', level: 0, priority: 'high', resources: [] },
+  { name: 'DevOps', level: 0, priority: 'medium', resources: [] },
+  { name: 'Shift-Left Testing', level: 0, priority: 'medium', resources: [] },
+
+  // 🧠 Test Design Concepts
+  { name: 'Test Automation Pyramid', level: 0, priority: 'high', resources: [] },
+  { name: 'Page Object Model', level: 0, priority: 'high', resources: [] },
+  { name: 'Data-Driven Testing', level: 0, priority: 'high', resources: [] },
+  { name: 'Risk-Based Testing', level: 0, priority: 'medium', resources: [] },
+  { name: 'Exploratory Testing', level: 0, priority: 'medium', resources: [] }
+],
   tools: [
-    { name: 'Git', level: 0, priority: 'high', resources: [] },
-    { name: 'Docker', level: 0, priority: 'high', resources: [] },
-    { name: 'Jenkins', level: 0, priority: 'high', resources: [] },
-    { name: 'GitHub Actions', level: 0, priority: 'high', resources: [] },
-    { name: 'CircleCI', level: 0, priority: 'medium', resources: [] },
-    { name: 'JMeter', level: 0, priority: 'medium', resources: [] },
-    { name: 'Postman', level: 0, priority: 'high', resources: [] },
-    { name: 'SoapUI', level: 0, priority: 'low', resources: [] },
-    { name: 'BrowserStack', level: 0, priority: 'medium', resources: [] },
-    { name: 'Sauce Labs', level: 0, priority: 'medium', resources: [] },
-    { name: 'Selenium Grid', level: 0, priority: 'medium', resources: [] },
-    { name: 'TestRail', level: 0, priority: 'medium', resources: [] },
-    { name: 'JIRA', level: 0, priority: 'high', resources: [] }
-  ],
+  // 🔧 Manual Testing Tools
+  { name: 'Postman', level: 0, priority: 'high', resources: [] },
+  { name: 'TestRail', level: 0, priority: 'medium', resources: [] },
+  { name: 'JIRA', level: 0, priority: 'high', resources: [] },
+  { name: 'Charles Proxy', level: 0, priority: 'medium', resources: [] },
+  { name: 'Fiddler', level: 0, priority: 'medium', resources: [] },
+  { name: 'Cypress Dashboard', level: 0, priority: 'medium', resources: [] },
+  { name: 'Applitools', level: 0, priority: 'medium', resources: [] },
+  { name: 'TestSigma', level: 0, priority: 'medium', resources: [] },
+
+  // 🤖 Automation Tools
+  { name: 'Selenium Grid', level: 0, priority: 'medium', resources: [] },
+  { name: 'BrowserStack', level: 0, priority: 'medium', resources: [] },
+  { name: 'Sauce Labs', level: 0, priority: 'medium', resources: [] },
+  { name: 'LambdaTest', level: 0, priority: 'medium', resources: [] },
+  { name: 'SoapUI', level: 0, priority: 'low', resources: [] },
+  { name: 'JMeter', level: 0, priority: 'medium', resources: [] },
+
+  // ⚙️ DevOps & CI/CD Tools
+  { name: 'Git', level: 0, priority: 'high', resources: [] },
+  { name: 'GitHub Actions', level: 0, priority: 'high', resources: [] },
+  { name: 'Jenkins', level: 0, priority: 'high', resources: [] },
+  { name: 'CircleCI', level: 0, priority: 'medium', resources: [] },
+  { name: 'Azure DevOps', level: 0, priority: 'medium', resources: [] },
+  { name: 'Docker', level: 0, priority: 'high', resources: [] },
+  { name: 'Kubernetes (CLI basics)', level: 0, priority: 'medium', resources: [] },
+  { name: 'Slack (CI alerts)', level: 0, priority: 'low', resources: [] },
+
+  // 📊 Monitoring & Quality Tools
+  { name: 'SonarQube', level: 0, priority: 'medium', resources: [] },
+  { name: 'Snyk', level: 0, priority: 'medium', resources: [] },
+  { name: 'Grafana', level: 0, priority: 'medium', resources: [] },
+  { name: 'Prometheus', level: 0, priority: 'medium', resources: [] },
+
+  // 🔐 Security Testing Tools
+  { name: 'ZAP (Zed Attack Proxy)', level: 0, priority: 'medium', resources: [] },
+  { name: 'Burp Suite', level: 0, priority: 'medium', resources: [] }
+],
 databases: [
+  // 🛠 Core SQL Databases
   { name: 'MySQL', level: 0, priority: 'high', resources: [] },
-  { name: 'PostgreSQL', level: 0, priority: 'medium', resources: [] },
-  { name: 'MongoDB', level: 0, priority: 'medium', resources: [] },
-  { name: 'SQLite', level: 0, priority: 'low', resources: [] },
-  { name: 'Oracle', level: 0, priority: 'medium', resources: [] },
+  { name: 'PostgreSQL', level: 0, priority: 'high', resources: [] },
   { name: 'SQL Server', level: 0, priority: 'medium', resources: [] },
+  { name: 'Oracle', level: 0, priority: 'medium', resources: [] },
+  { name: 'SQLite', level: 0, priority: 'low', resources: [] },
+
+  // 📦 NoSQL & Caching
+  { name: 'MongoDB', level: 0, priority: 'medium', resources: [] },
   { name: 'Redis', level: 0, priority: 'low', resources: [] },
-  { name: 'Database Performance Testing', level: 0, priority: 'high', resources: [] },
-  { name: 'SQL Query Optimization', level: 0, priority: 'high', resources: [] },
-  { name: 'Database Design', level: 0, priority: 'medium', resources: [] },
-  { name: 'Database Backup & Recovery', level: 0, priority: 'low', resources: [] },
+
+  // 🔍 Testing Skills
   { name: 'Database Testing', level: 0, priority: 'high', resources: [] },
+  { name: 'SQL Query Optimization', level: 0, priority: 'high', resources: [] },
   { name: 'SQL Injection Testing', level: 0, priority: 'high', resources: [] },
-  { name: 'Database Performance Testing', level: 0, priority: 'medium', resources: [] },
   { name: 'Data Integrity Testing', level: 0, priority: 'high', resources: [] },
   { name: 'Database Migration Testing', level: 0, priority: 'medium', resources: [] },
+  { name: 'Database Design', level: 0, priority: 'medium', resources: [] },
+  { name: 'Database Backup & Recovery', level: 0, priority: 'low', resources: [] },
+  { name: 'Database Performance Testing', level: 0, priority: 'medium', resources: [] }
 ]
 };
 
