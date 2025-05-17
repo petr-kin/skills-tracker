@@ -71,7 +71,25 @@ const initialSkills = {
     { name: 'Selenium Grid', level: 0, priority: 'medium', resources: [] },
     { name: 'TestRail', level: 0, priority: 'medium', resources: [] },
     { name: 'JIRA', level: 0, priority: 'high', resources: [] }
-  ]
+  ],
+databases: [
+  { name: 'MySQL', level: 0, priority: 'high', resources: [] },
+  { name: 'PostgreSQL', level: 0, priority: 'medium', resources: [] },
+  { name: 'MongoDB', level: 0, priority: 'medium', resources: [] },
+  { name: 'SQLite', level: 0, priority: 'low', resources: [] },
+  { name: 'Oracle', level: 0, priority: 'medium', resources: [] },
+  { name: 'SQL Server', level: 0, priority: 'medium', resources: [] },
+  { name: 'Redis', level: 0, priority: 'low', resources: [] },
+  { name: 'Database Performance Testing', level: 0, priority: 'high', resources: [] },
+  { name: 'SQL Query Optimization', level: 0, priority: 'high', resources: [] },
+  { name: 'Database Design', level: 0, priority: 'medium', resources: [] },
+  { name: 'Database Backup & Recovery', level: 0, priority: 'low', resources: [] },
+  { name: 'Database Testing', level: 0, priority: 'high', resources: [] },
+  { name: 'SQL Injection Testing', level: 0, priority: 'high', resources: [] },
+  { name: 'Database Performance Testing', level: 0, priority: 'medium', resources: [] },
+  { name: 'Data Integrity Testing', level: 0, priority: 'high', resources: [] },
+  { name: 'Database Migration Testing', level: 0, priority: 'medium', resources: [] },
+]
 };
 
 // Initial courses data
@@ -153,6 +171,13 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [githubError, setGithubError] = useState(null);
   const [lastSaved, setLastSaved] = useState(null);
+
+  // Priority management
+  const handlePriorityChange = (category, index, newPriority) => {
+  const updatedSkills = { ...skills };
+  updatedSkills[category][index].priority = newPriority;
+  setSkills(updatedSkills);
+};
 
   // Save to localStorage
   useEffect(() => {
@@ -990,6 +1015,17 @@ function App() {
     );
   };
 
+   // Update the getPriorityColor function to include the "none" priority
+  const getPriorityColor = (priority) => {
+  switch (priority) {
+    case 'high': return 'text-red-500';
+    case 'medium': return 'text-yellow-500';
+    case 'low': return 'text-green-500';
+    case 'none': return 'text-gray-400';
+    default: return '';
+  }
+};
+
   const renderSkillsTab = () => (
     <>
       {/* Search bar */}
@@ -1059,71 +1095,83 @@ function App() {
           </button>
         ))}
       </div>
-      
       {/* Skills list */}
       <div>
         {filteredSkills[activeCategory] && filteredSkills[activeCategory].length > 0 ? (
-          filteredSkills[activeCategory].map((skill, index) => (
-            <div key={index} className="card">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                <h3 style={{ margin: 0 }}>{skill.name}</h3>
-                <span style={{ 
-                  padding: '0.2rem 0.5rem', 
-                  borderRadius: '1rem', 
-                  fontSize: '0.8rem',
-                  backgroundColor: skill.priority === 'high' ? '#fee2e2' : 
-                                 skill.priority === 'medium' ? '#fef3c7' : '#d1fae5',
-                  color: skill.priority === 'high' ? '#b91c1c' : 
-                        skill.priority === 'medium' ? '#92400e' : '#065f46'
-                }}>
-                  {skill.priority} priority
-                </span>
-              </div>
-              
-              <div>
-                <p>Proficiency: <strong>{getLevelLabel(skill.level)}</strong></p>
-                <div>
-                  {[0, 1, 2, 3].map(level => (
-                    <button
-                      key={level}
-                      onClick={() => handleLevelChange(activeCategory, skills[activeCategory].findIndex(s => s.name === skill.name), level)}
-                      title={getLevelLabel(level)}
-                      className={`skill-level ${skill.level >= level && level > 0 ? `level-${level}` : ''}`}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      {skill.level >= level && level > 0 ? '✓' : ''}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Resources section */}
-              {skill.resources && skill.resources.length > 0 && (
-                <div style={{ marginTop: '1rem' }}>
-                  <h4 style={{ fontSize: '0.9rem', margin: '0 0 0.25rem 0' }}>Learning Resources:</h4>
-                  <ul style={{ margin: 0, paddingLeft: '1.5rem' }}>
-                    {skill.resources.map((resource, idx) => (
-                      <li key={idx}>
-                        <a 
-                          href={resource.url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          style={{ color: '#3b82f6' }}
-                        >
-                          {resource.title}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          ))
-        ) : (
-          <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
-            {searchTerm ? 'No skills match your search.' : 'No skills in this category.'}
-          </div>
-        )}
+  filteredSkills[activeCategory].map((skill, index) => (
+    <div key={index} className="card">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+        <h3 style={{ margin: 0 }}>{skill.name}</h3>
+        <div>
+          <select
+            value={skill.priority}
+            onChange={(e) => handlePriorityChange(activeCategory, skills[activeCategory].findIndex(s => s.name === skill.name), e.target.value)}
+            style={{
+              padding: '0.2rem 0.5rem',
+              borderRadius: '0.25rem',
+              fontSize: '0.8rem',
+              border: '1px solid #ddd',
+              marginRight: '0.5rem',
+              backgroundColor: skill.priority === 'high' ? '#fee2e2' : 
+                              skill.priority === 'medium' ? '#fef3c7' : 
+                              skill.priority === 'low' ? '#d1fae5' : '#f3f4f6',
+              color: skill.priority === 'high' ? '#b91c1c' : 
+                    skill.priority === 'medium' ? '#92400e' : 
+                    skill.priority === 'low' ? '#065f46' : '#6b7280'
+            }}
+          >
+            <option value="high">High priority</option>
+            <option value="medium">Medium priority</option>
+            <option value="low">Low priority</option>
+            <option value="none">No priority</option>
+          </select>
+        </div>
+      </div>
+      
+      <div>
+        <p>Proficiency: <strong>{getLevelLabel(skill.level)}</strong></p>
+        <div>
+          {[0, 1, 2, 3].map(level => (
+            <button
+              key={level}
+              onClick={() => handleLevelChange(activeCategory, skills[activeCategory].findIndex(s => s.name === skill.name), level)}
+              title={getLevelLabel(level)}
+              className={`skill-level ${skill.level >= level && level > 0 ? `level-${level}` : ''}`}
+              style={{ cursor: 'pointer' }}
+            >
+              {skill.level >= level && level > 0 ? '✓' : ''}
+            </button>
+          ))}
+        </div>
+      </div>
+      
+      {/* Resources section */}
+      {skill.resources && skill.resources.length > 0 && (
+        <div style={{ marginTop: '1rem' }}>
+          <h4 style={{ fontSize: '0.9rem', margin: '0 0 0.25rem 0' }}>Learning Resources:</h4>
+          <ul style={{ margin: 0, paddingLeft: '1.5rem' }}>
+            {skill.resources.map((resource, idx) => (
+              <li key={idx}>
+                <a 
+                  href={resource.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{ color: '#3b82f6' }}
+                >
+                  {resource.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  ))
+) : (
+  <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+    {searchTerm ? 'No skills match your search.' : 'No skills in this category.'}
+  </div>
+)}
       </div>
     </>
   );
