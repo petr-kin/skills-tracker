@@ -317,6 +317,20 @@ function App() {
     }
   };
 
+  // Sort skills by priority
+const sortByPriority = (skills) => {
+  const priorityOrder = {
+    'high': 1,
+    'medium': 2,
+    'low': 3,
+    'none': 4
+  };
+  
+  return [...skills].sort((a, b) => {
+    return priorityOrder[a.priority] - priorityOrder[b.priority];
+  });
+};
+  
   // Get level label
   const getLevelLabel = (level) => {
     switch (level) {
@@ -1096,37 +1110,37 @@ function App() {
         ))}
       </div>
       {/* Skills list */}
-      <div>
-        {filteredSkills[activeCategory] && filteredSkills[activeCategory].length > 0 ? (
-  filteredSkills[activeCategory].map((skill, index) => (
-    <div key={index} className="card">
+  <div>
+  {filteredSkills[activeCategory] && filteredSkills[activeCategory].length > 0 ? (
+    sortByPriority(filteredSkills[activeCategory]).map((skill, index) => (
+      <div key={index} className="card">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-        <h3 style={{ margin: 0 }}>{skill.name}</h3>
-        <div>
-          <select
-            value={skill.priority}
-            onChange={(e) => handlePriorityChange(activeCategory, skills[activeCategory].findIndex(s => s.name === skill.name), e.target.value)}
-            style={{
-              padding: '0.2rem 0.5rem',
-              borderRadius: '0.25rem',
-              fontSize: '0.8rem',
-              border: '1px solid #ddd',
-              marginRight: '0.5rem',
-              backgroundColor: skill.priority === 'high' ? '#fee2e2' : 
-                              skill.priority === 'medium' ? '#fef3c7' : 
-                              skill.priority === 'low' ? '#d1fae5' : '#f3f4f6',
-              color: skill.priority === 'high' ? '#b91c1c' : 
-                    skill.priority === 'medium' ? '#92400e' : 
-                    skill.priority === 'low' ? '#065f46' : '#6b7280'
-            }}
-          >
-            <option value="high">High priority</option>
-            <option value="medium">Medium priority</option>
-            <option value="low">Low priority</option>
-            <option value="none">No priority</option>
-          </select>
+          <h3 style={{ margin: 0 }}>{skill.name}</h3>
+          <div>
+            <select
+              value={skill.priority}
+              onChange={(e) => handlePriorityChange(activeCategory, skills[activeCategory].findIndex(s => s.name === skill.name), e.target.value)}
+              style={{
+                padding: '0.2rem 0.5rem',
+                borderRadius: '0.25rem',
+                fontSize: '0.8rem',
+                border: '1px solid #ddd',
+                marginRight: '0.5rem',
+                backgroundColor: skill.priority === 'high' ? '#fee2e2' : 
+                                skill.priority === 'medium' ? '#fef3c7' : 
+                                skill.priority === 'low' ? '#d1fae5' : '#f3f4f6',
+                color: skill.priority === 'high' ? '#b91c1c' : 
+                      skill.priority === 'medium' ? '#92400e' : 
+                      skill.priority === 'low' ? '#065f46' : '#6b7280'
+              }}
+            >
+              <option value="high">High priority</option>
+              <option value="medium">Medium priority</option>
+              <option value="low">Low priority</option>
+              <option value="none">No priority</option>
+            </select>
+          </div>
         </div>
-      </div>
       
       <div>
         <p>Proficiency: <strong>{getLevelLabel(skill.level)}</strong></p>
@@ -1165,14 +1179,14 @@ function App() {
           </ul>
         </div>
       )}
+   </div>
+    ))
+  ) : (
+    <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+      {searchTerm ? 'No skills match your search.' : 'No skills in this category.'}
     </div>
-  ))
-) : (
-  <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
-    {searchTerm ? 'No skills match your search.' : 'No skills in this category.'}
-  </div>
-)}
-      </div>
+  )}
+</div>
     </>
   );
   
